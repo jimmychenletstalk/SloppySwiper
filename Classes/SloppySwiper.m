@@ -15,6 +15,7 @@
 @property (strong, nonatomic) UIPercentDrivenInteractiveTransition *interactionController;
 /// A Boolean value that indicates whether the navigation controller is currently animating a push/pop operation.
 @property (nonatomic) BOOL duringAnimation;
+@property (nonatomic, strong) NSMutableArray *noSwiperInfos;
 @end
 
 @implementation SloppySwiper
@@ -57,6 +58,19 @@
 
     _animator = [[SSWAnimator alloc] init];
     _animator.delegate = self;
+
+    self.noSwiperInfos = [NSMutableArray new];
+    __weak typeof(self)weakSelf = self;
+    [[NSNotificationCenter defaultCenter] addObserverForName:D_NOTIFICATION_ADD_NO_SWIPER object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        NoSwiperInfo *info = (NoSwiperInfo *)note.object;
+        [strongSelf.noSwiperInfos addObject:info];
+    }];
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:D_NOTIFICATION_REMOVE_NO_SWIPER object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull note) {
+        __strong __typeof(weakSelf)strongSelf = weakSelf;
+        [strongSelf.noSwiperInfos removeAllObjects];
+    }];
 }
 
 #pragma mark - SSWAnimatorDelegate
@@ -109,9 +123,36 @@
 #pragma mark - UIGestureRecognizerDelegate
 
 -(BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer {
-    if (self.navigationController.viewControllers.count > 1) {
+    if (self.disablePopCheck) {
+        return NO;
+    }
+    BOOL isContain = NO;
+    CGPoint startLocation = [gestureRecognizer locationInView:self.navigationController.view];
+    
+    if (self.smallLocationCheck) {
+        if (startLocation.x > self.navigationController.view.frame.size.width/4) {
+            return NO;
+        }
+    }
+    
+    CGRect rect = [self.navigationController.navigationBar.superview convertRect:self.navigationController.navigationBar.frame toView:nil];
+    isContain = CGRectContainsPoint(rect, startLocation);
+    if (!isContain){
+        NSString *className = NSStringFromClass([self.navigationController.topViewController class]);
+        for (NoSwiperInfo *info in self.noSwiperInfos){
+            if ([info.className isEqualToString:className]){
+                isContain = CGRectContainsPoint(info.viewRect, startLocation);
+                if (isContain){
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (NO == isContain && self.navigationController.viewControllers.count > 1){
         return YES;
     }
+    
     return NO;
 }
 

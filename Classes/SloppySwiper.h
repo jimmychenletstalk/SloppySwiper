@@ -24,6 +24,15 @@
 
 @end
 
+#define D_NOTIFICATION_ADD_NO_SWIPER @"D_NOTIFICATION_ADD_NO_SWIPER"
+#define D_NOTIFICATION_REMOVE_NO_SWIPER @"D_NOTIFICATION_REMOVE_NO_SWIPER"
+
+@interface NoSwiperInfo:NSObject
+@property (nonatomic, strong) NSString *className;
+@property (nonatomic) CGRect viewRect;
++ (CGRect)defaultIgnoreFrameByView:(UIView *)view;
+@end
+
 /**
  *  `SloppySwiper` is a class conforming to `UINavigationControllerDelegate` protocol that allows pan back gesture to be started from anywhere on the screen (not only from the left edge).
  */
@@ -36,5 +45,8 @@
 
 /// Designated initializer if the class isn't used from the Interface Builder.
 - (instancetype)initWithNavigationController:(UINavigationController *)navigationController;
+
+@property BOOL smallLocationCheck;
+@property BOOL disablePopCheck;
 
 @end

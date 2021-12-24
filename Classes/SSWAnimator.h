@@ -20,7 +20,9 @@ FOUNDATION_EXPORT UIViewAnimationOptions const SSWNavigationTransitionCurve;
 @end
 
 @interface SSWAnimator : NSObject <UIViewControllerAnimatedTransitioning>
-
+{
+    BOOL _isPreviousViewHideTabBar;
+}
 @property (nonatomic, weak) id<SSWAnimatorDelegate> delegate;
 
 @end
