@@ -9,8 +9,6 @@
 #import "OLSCSSWAnimator.h"
 UIViewAnimationOptions const SSWNavigationTransitionCurve = 7 << 16;
 
-#import "LTContentViewController.h"
-
 @implementation UIView (TransitionShadow)
 - (void)addLeftSideShadowWithFading
 {
@@ -119,9 +117,6 @@ UIViewAnimationOptions const SSWNavigationTransitionCurve = 7 << 16;
         self.toViewController.view.transform = CGAffineTransformIdentity;
         if (fromVCOriTabHidden) {
             [self.fromViewController.tabBarController.tabBar setHidden:YES];
-        }
-        if (![self.fromViewController isKindOfClass:LTContentViewController.class]) {
-            [self.fromViewController.navigationController setNavigationBarHidden:NO];
         }
     }else{
         if (!_isPreviousViewHideTabBar) {
